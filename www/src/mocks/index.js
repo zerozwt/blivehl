@@ -5,7 +5,6 @@ Mock.setup({timeout: "200-400"});
 let confArr = [];
 
 const files = import.meta.glob('./*.js');
-console.log(files);
 for (const key in files) {
     if (key == "./index.js") continue;
     confArr = confArr.concat((await import(key)).default);

@@ -50,8 +50,9 @@ const jumpto = () => {
     router.push("/" + roomid.value)
 }
 
+const message = useMessage()
+
 onMounted(()=> {
-    let message = useMessage()
     axios.get("/api/room_list").then(rsp => {
         let data = rsp.data;
         if (data.code != 0) {
@@ -60,9 +61,7 @@ onMounted(()=> {
         }
         data.data.list.forEach(item => {
             rooms.push(item)
-            console.log(item)
         })
-        console.log(rooms)
     }).catch(err => message.error(JSON.stringify(err)))
 })
 </script>
