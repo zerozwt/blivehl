@@ -2,6 +2,8 @@ package service
 
 import (
 	"fmt"
+	"strings"
+	"time"
 
 	"github.com/zerozwt/blivehl/server/bs"
 	"github.com/zerozwt/blivehl/server/db"
@@ -35,7 +37,7 @@ func (s *HighlightService) Query(req *bs.TimelineRequest) (*bs.TimelineResponse,
 	return &ret, nil
 }
 
-func (s *HighlightService) GenerateCSVLines(roomId int, liveId int64) ([][]string, error) {
+func (s *HighlightService) GenerateCSVLines(roomId int, liveId int64) ([][]string, string, error) {
 	ret := [][]string{}
 	addLine := func(cells ...any) {
 		line := []string{}
@@ -46,15 +48,18 @@ func (s *HighlightService) GenerateCSVLines(roomId int, liveId int64) ([][]strin
 	}
 
 	meta := false
+	fileNameParts := []string{}
 
 	// get streamer info
 	info, err := GetRoomInfoFetcher().GetRoomInfo(roomId)
 	if err != nil {
 		logger.WARN("get streamer info for room %d failed: %v", roomId, err)
+		fileNameParts = append(fileNameParts, fmt.Sprint(roomId))
 	} else {
 		addLine("主播", info.Liver.Base.Name)
 		addLine("UID", info.Base.Uid)
 		addLine("直播间", roomId)
+		fileNameParts = append(fileNameParts, s.filterFileName(info.Liver.Base.Name))
 		meta = true
 	}
 
@@ -65,8 +70,12 @@ func (s *HighlightService) GenerateCSVLines(roomId int, liveId int64) ([][]strin
 	} else {
 		addLine("直播标题", liveInfo[0].Title)
 		addLine("开播时间", liveInfo[0].LiveStartTime)
+		fileNameParts = append(fileNameParts, s.filterFileName(liveInfo[0].Title))
 		meta = true
 	}
+	tm := time.Unix(liveId, 0).In(CSTZone)
+	fileNameParts = append(fileNameParts, fmt.Sprintf("%04d%02d%02d_%02d%02d%02d",
+		tm.Year(), tm.Month(), tm.Day(), tm.Hour(), tm.Minute(), tm.Second()))
 
 	if meta {
 		addLine("")
@@ -75,7 +84,7 @@ func (s *HighlightService) GenerateCSVLines(roomId int, liveId int64) ([][]strin
 	// get timeline
 	list, err := db.QueryHightlight(roomId, liveId)
 	if err != nil {
-		return nil, err
+		return nil, "", err
 	}
 	if len(list) > 0 {
 		addLine("高能时间", "高能内容")
@@ -84,7 +93,7 @@ func (s *HighlightService) GenerateCSVLines(roomId int, liveId int64) ([][]strin
 		}
 	}
 
-	return ret, nil
+	return ret, strings.Join(fileNameParts, "_"), nil
 }
 
 func (s *HighlightService) renderTimeStamp(ts int64) string {
@@ -92,5 +101,20 @@ func (s *HighlightService) renderTimeStamp(ts int64) string {
 	if ts > 3600 {
 		ret = fmt.Sprintf("%d小时", ts/3600) + ret
 	}
+	return ret
+}
+
+func (s *HighlightService) filterFileName(name string) string {
+	ret := ""
+
+	for _, ch := range name {
+		switch ch {
+		case '<', '>', ':', '"', '\'', '/', '\\', '|', '?', '*':
+			ret += "_"
+		default:
+			ret += string(ch)
+		}
+	}
+
 	return ret
 }

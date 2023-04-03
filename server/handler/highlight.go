@@ -3,6 +3,7 @@ package handler
 import (
 	"bytes"
 	"encoding/csv"
+	"fmt"
 	"net/http"
 
 	"github.com/zerozwt/blivehl/server/bs"
@@ -33,7 +34,7 @@ func download(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	csvLines, err := service.GetHightlightService().GenerateCSVLines(req.RoomID, req.LiveID)
+	csvLines, fileName, err := service.GetHightlightService().GenerateCSVLines(req.RoomID, req.LiveID)
 
 	if err != nil {
 		logger.ERROR("download generate csv lines failed: %v", err)
@@ -52,5 +53,6 @@ func download(w http.ResponseWriter, r *http.Request) {
 	}
 
 	w.Header().Set("Content-Type", "application/octet-stream")
+	w.Header().Set("Content-Disposition", fmt.Sprintf(`inline; filename="%s.csv"`, fileName))
 	w.Write(csvData.Bytes())
 }
