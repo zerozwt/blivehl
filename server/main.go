@@ -9,6 +9,7 @@ import (
 
 	"github.com/zerozwt/blivehl/server/db"
 	"github.com/zerozwt/blivehl/server/engine"
+	"github.com/zerozwt/blivehl/server/handler"
 	"github.com/zerozwt/blivehl/server/logger"
 	"github.com/zerozwt/blivehl/server/service"
 )
@@ -85,6 +86,8 @@ func main() {
 		return
 	}
 	logger.INFO("cached pictures will be stored at %s ...", cacheDir)
+
+	handler.InitHandlers()
 
 	fmt.Printf("Please open your web browser and visit http://localhost:%d\n", gPort)
 	engine.Serve(gWebDir, gPort)

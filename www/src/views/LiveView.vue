@@ -185,7 +185,7 @@ const CommitHighLight = () => {
     if (!comment) comment = "(暂未填写描述)"
     HightLightCommitting.value = true
     axios.post("/api/commit", {
-        room_id: BasicInfo.room_id,
+        room_id: Number(BasicInfo.room_id),
         live_id: CurrentLiveInfo.live_id,
         ts: CurrentLiveInfo.light_ts,
         comment: comment,

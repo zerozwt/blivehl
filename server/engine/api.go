@@ -8,6 +8,7 @@ import (
 	"strconv"
 
 	jsoniter "github.com/json-iterator/go"
+	"github.com/zerozwt/blivehl/server/logger"
 )
 
 func handleError(w http.ResponseWriter, r *http.Request, err error) {
@@ -46,6 +47,7 @@ func makeAPIHandler[InType, OutType any](handler func(*InType) (*OutType, error)
 		if err != nil {
 			outCode = 233
 			outMsg = err.Error()
+			logger.ERROR("request %s failed: %v", r.URL.Path, err)
 		}
 		outMap := map[string]any{
 			"code": outCode,

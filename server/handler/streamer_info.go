@@ -18,3 +18,5 @@ func basicInfo(req *bs.BasicInfoRequest) (*bs.BasicInfoResponse, error) {
 func recentRooms(req *bs.RoomListRequest) (*bs.RoomListResponse, error) {
 	return service.GetRoomInfoService().GetRecentRooms()
 }
+
+func InitHandlers() {}

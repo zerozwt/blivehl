@@ -22,7 +22,7 @@ const (
 
 func InitPictureCache(wwwroot string) (string, error) {
 	gPicCacheDir = filepath.Join(wwwroot, PIC_DIR)
-	return gPicCacheDir, os.MkdirAll(gPicCacheDir, 0644)
+	return gPicCacheDir, os.MkdirAll(gPicCacheDir, 0755)
 }
 
 func SaveFileAndGetLocalUrl(uid int64, picurl string) (string, error) {
@@ -45,7 +45,7 @@ func SaveFileAndGetLocalUrl(uid int64, picurl string) (string, error) {
 	localUrl := "/" + PIC_DIR + "/" + sUID + "/" + localName
 	localFile := filepath.Join(gPicCacheDir, sUID, localName)
 
-	if err := os.MkdirAll(filepath.Join(gPicCacheDir, sUID), 0644); err != nil {
+	if err := os.MkdirAll(filepath.Join(gPicCacheDir, sUID), 0755); err != nil {
 		return "", err
 	}
 

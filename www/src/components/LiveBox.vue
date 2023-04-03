@@ -61,9 +61,9 @@ const onDownload = () => {
 
 const onEntryUpdate = (ts, comment) => {
     axios.post("/api/commit", {
-        room_id: props.roomid,
-        live_id: props.liveData.live_id,
-        ts: ts,
+        room_id: Number(props.roomid),
+        live_id: Number(props.liveData.live_id),
+        ts: Number(ts),
         comment: !comment ? "(暂未填写描述)" : comment,
     }).then(rsp => {
         let data = rsp.data
