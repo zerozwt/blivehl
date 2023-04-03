@@ -59,6 +59,7 @@ onMounted(()=> {
             message.error(`[${data.code}]请求失败: ${data.msg}`)
             return
         }
+        rooms.length = 0
         data.data.list.forEach(item => {
             rooms.push(item)
         })
