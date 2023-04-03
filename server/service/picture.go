@@ -40,9 +40,14 @@ func SaveFileAndGetLocalUrl(uid int64, picurl string) (string, error) {
 	sum := md5.Sum([]byte(picurl))
 	hash := hex.EncodeToString(sum[:])
 
-	localName := fmt.Sprintf("%d_%s.%s", uid, hash, ext)
-	localUrl := "/" + PIC_DIR + "/" + localName
-	localFile := filepath.Join(gPicCacheDir, localName)
+	sUID := fmt.Sprint(uid)
+	localName := fmt.Sprintf("%s.%s", hash, ext)
+	localUrl := "/" + PIC_DIR + "/" + sUID + "/" + localName
+	localFile := filepath.Join(gPicCacheDir, sUID, localName)
+
+	if err := os.MkdirAll(filepath.Join(gPicCacheDir, sUID), 0644); err != nil {
+		return "", err
+	}
 
 	if _, err := os.Stat(localFile); err == nil {
 		return localUrl, nil

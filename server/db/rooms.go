@@ -5,7 +5,6 @@ import (
 	"strconv"
 	"time"
 
-	jsoniter "github.com/json-iterator/go"
 	"go.etcd.io/bbolt"
 )
 
@@ -26,20 +25,17 @@ func roomid2key(roomId int) []byte {
 }
 
 func putRoomInfo(bucket *bbolt.Bucket, info *LiveRoomInfo) {
-	json := jsoniter.ConfigCompatibleWithStandardLibrary
-	data, _ := json.Marshal(info)
-	bucket.Put(roomid2key(info.RoomID), data)
+	bucket.Put(roomid2key(info.RoomID), encodeValue(info))
 }
 
 func SaveRecentLiveRoom(uid int64, roomId int, name, icon string) error {
 	return gDB.Update(func(tx *bbolt.Tx) error {
-		json := jsoniter.ConfigCompatibleWithStandardLibrary
 		infoMap := make(map[int]*LiveRoomInfo)
 
 		bucket, _ := tx.CreateBucketIfNotExists([]byte("recent"))
 		if err := bucket.ForEach(func(k, v []byte) error {
 			item := LiveRoomInfo{}
-			err := json.Unmarshal(v, &item)
+			err := decodeValue(v, &item)
 			if err != nil {
 				return err
 			}
@@ -79,7 +75,6 @@ func SaveRecentLiveRoom(uid int64, roomId int, name, icon string) error {
 }
 
 func GetRecentRooms() ([]*LiveRoomInfo, error) {
-	json := jsoniter.ConfigCompatibleWithStandardLibrary
 	ret := []*LiveRoomInfo{}
 	err := gDB.View(func(tx *bbolt.Tx) error {
 		bucket := tx.Bucket([]byte("recent"))
@@ -88,7 +83,7 @@ func GetRecentRooms() ([]*LiveRoomInfo, error) {
 		}
 		return bucket.ForEach(func(k, v []byte) error {
 			item := LiveRoomInfo{}
-			err := json.Unmarshal(v, &item)
+			err := decodeValue(v, &item)
 			if err != nil {
 				return err
 			}

@@ -24,7 +24,7 @@ func (s *RoomService) GetBasicInfo(req *bs.BasicInfoRequest) (*bs.BasicInfoRespo
 	ret := &bs.BasicInfoResponse{}
 	ret.Streamer.UID = info.Base.Uid
 	ret.Streamer.Name = info.Liver.Base.Name
-	ret.Streamer.Icon = info.Liver.Base.Icon //TODO: change to locally saved picture
+	ret.Streamer.Icon = info.Liver.Base.Icon
 
 	// async save live room cover
 	ch_cover := make(chan bool)
