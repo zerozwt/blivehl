@@ -64,7 +64,7 @@ const onEntryUpdate = (ts, comment) => {
         room_id: props.roomid,
         live_id: props.liveData.live_id,
         ts: ts,
-        comment: comment,
+        comment: !comment ? "(暂未填写描述)" : comment,
     }).then(rsp => {
         let data = rsp.data
         if (data.code != 0) {
