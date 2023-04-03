@@ -80,6 +80,7 @@ func (s *LiveInfoService) GetLiveList(req *bs.LiveListRequest) (*bs.LiveListResp
 				Cover:         "",
 				LiveID:        info.Base.LiveStartTime,
 			}
+			currentLive.Cover, _ = SaveFileAndGetLocalUrl(info.Base.Uid, info.Base.Cover)
 		} else if err != nil {
 			logger.WARN("query current live status for room %d in live_list failed: %v", req.RoomID, err)
 		}
