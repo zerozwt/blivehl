@@ -20,7 +20,7 @@
                     </n-space>
                 </n-space>
             </n-card>
-            <LiveBox v-for="item in LiveList" :key="item.live_id" :live-data="item" :roomid="$route.params.roomid"/>
+            <LiveBox v-for="item in LiveList" :key="item.live_id" :live-data="item" :roomid="$route.params.roomid" @copyTimeline="onCopytimeline"/>
             <div v-if="!LiveListEnded">
                 <n-button type="tertiary" class="more-button" @click="AppendLiveList" :disabled="Appending">点击加载更多记录</n-button>
             </div>
@@ -45,6 +45,11 @@
                     </n-space>
                 </n-layout-content>
             </n-layout>
+        </n-card>
+    </n-modal>
+    <n-modal v-model:show="ShowCopyTimeline">
+        <n-card title="复制高能时间轴" closable @close="event => {ShowCopyTimeline = false}" class="lightup-modal">
+            <n-input type="textarea" :value="TimelineData" :allow-input="value => false" rows="10"/>
         </n-card>
     </n-modal>
 </template>
@@ -200,6 +205,13 @@ const CommitHighLight = () => {
         HightLightCommitting.value = false
         LightUpModalShow.value = false
     })
+}
+
+const ShowCopyTimeline = ref(false)
+const TimelineData = ref("")
+const onCopytimeline = (copyData) => {
+    TimelineData.value = copyData
+    ShowCopyTimeline.value = true
 }
 
 </script>

@@ -8,6 +8,7 @@
                 <span>开播时间: {{ props.liveData.live_start_time }}</span>
                 <span></span>
                 <n-space>
+                    <n-button circle @click="emitCopyTimeline" v-if="timeline.length>0"><n-icon><CopyIcon/></n-icon></n-button>
                     <n-button circle @click="onDownload"><n-icon><DownloadIcon/></n-icon></n-button>
                     <n-button circle :disabled="loadingTimeline" @click="refreshTimeline"><n-icon><RfreshIcon/></n-icon></n-button>
                     <div style="padding-top: 6px;">高能瞬间:</div>
@@ -29,8 +30,10 @@ import { inject, onMounted, onUpdated, reactive, ref } from 'vue';
 import TimelineEntry from './TimelineEntry.vue';
 import RfreshIcon from '../components/icons/RfreshIcon.vue'
 import DownloadIcon from '../components/icons/DownloadIcon.vue'
+import CopyIcon from '../components/icons/CopyIcon.vue'
 
 const props = defineProps(['liveData', 'roomid'])
+const emit = defineEmits(['copyTimeline'])
 const timeline = reactive([])
 const loadingTimeline = ref(true)
 const message = useMessage()
@@ -73,6 +76,19 @@ const onEntryUpdate = (ts, comment) => {
         }
         refreshTimeline()
     }).catch(err => message.error(JSON.stringify(err)))
+}
+
+const emitCopyTimeline = () => {
+    if (timeline.length <= 0) return
+    let data = []
+    timeline.forEach((item) => {
+        data.push(RenderTimestamp(item.time)+': '+item.comment)
+    })
+    let reverse = []
+    for (let i = data.length-1; i >= 0; i--) {
+        reverse.push(data[i])
+    }
+    emit('copyTimeline', reverse.join('\n'))
 }
 </script>
 
