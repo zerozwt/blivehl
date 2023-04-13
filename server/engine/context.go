@@ -40,10 +40,21 @@ func (ctx *Context) PutValue(key, value any) {
 	ctx.values[key] = ctx.values[value]
 }
 
-func (ctx *Context) GetValue(key any) any {
+func (ctx *Context) GetValue(key any) (any, bool) {
 	value, ok := ctx.values[key]
 	if ok {
-		return value
+		return value, true
 	}
-	return nil
+	return nil, false
+}
+
+func CtxValue[T any](ctx *Context, key any) (ret T, ok bool) {
+	value, ok := ctx.GetValue(key)
+	if !ok {
+		return
+	}
+	if tmpValue, tmpOk := value.(T); tmpOk {
+		return tmpValue, true
+	}
+	return
 }
