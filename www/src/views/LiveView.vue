@@ -1,10 +1,15 @@
 <template>
     <n-layout>
         <n-layout-header bordered>
-            <n-breadcrumb>
-                <n-breadcrumb-item><router-link to="/">首页</router-link></n-breadcrumb-item>
-                <n-breadcrumb-item>{{ BasicInfoLoaded ? BasicInfo.name : $route.params.roomid }}</n-breadcrumb-item>
-            </n-breadcrumb>
+            <div class="navbar">
+                <div style="float:left; padding-top: 1px;">
+                    <n-breadcrumb separator=">">
+                        <n-breadcrumb-item><router-link to="/">首页</router-link></n-breadcrumb-item>
+                        <n-breadcrumb-item>{{ BasicInfoLoaded ? BasicInfo.name : $route.params.roomid }}</n-breadcrumb-item>
+                    </n-breadcrumb>
+                </div>
+                <div style="float: right; padding-bottom: 4px;"><LoginStatus @login="AfterLogin"/></div>
+            </div>
         </n-layout-header>
         <n-layout-content v-if="BasicInfoLoaded">
             <n-card title="主播基本信息" class="basic-info">
@@ -57,10 +62,14 @@
 <script setup>
 import {RouterLink, useRoute, useRouter} from 'vue-router'
 import {onMounted, provide, reactive, ref} from 'vue'
-import axios from 'axios';
 import { useMessage } from 'naive-ui';
 import LightBulbIcon from '../components/icons/LightBulbIcon.vue';
 import LiveBox from '../components/LiveBox.vue';
+import router from "@/router"
+import createAPICaller from '@/utils'
+import LoginStatus from '../components/LoginStatus.vue'
+
+const API = createAPICaller(router)
 
 const BasicInfoLoaded = ref(false)
 const BasicInfo = reactive({
@@ -70,14 +79,14 @@ const BasicInfo = reactive({
     icon: "",
 })
 
-const router = useRouter()
+const routerObj = useRouter()
 const route = useRoute()
 const message = useMessage()
 
 const LiveList = reactive([])
 const LiveListEnded = ref(false)
 const InitLiveList = () => {
-    axios.get("/api/live/list", {params:{room_id: route.params.roomid, until: 0}}).then(rsp => {
+    API.get("/api/live/list", {params:{room_id: route.params.roomid, until: 0}}).then(rsp => {
         let data = rsp.data
         if (data.code != 0) {
             message.error(`[${data.code}]请求失败: ${data.msg}`)
@@ -99,7 +108,7 @@ const Appending = ref(false)
 const AppendLiveList = () => {
     if (!LiveList.length) return
     Appending.value = true
-    axios.get("/api/live/list", {params:{room_id: route.params.roomid, until: LiveList[LiveList.length-1].live_id-1}}).then(rsp => {
+    API.get("/api/live/list", {params:{room_id: route.params.roomid, until: LiveList[LiveList.length-1].live_id-1}}).then(rsp => {
         let data = rsp.data
         if (data.code != 0) {
             message.error(`[${data.code}]请求失败: ${data.msg}`)
@@ -115,9 +124,9 @@ const AppendLiveList = () => {
     }).catch(err => message.error(JSON.stringify(err))).finally(() => {Appending.value = false})
 }
 
-onMounted(() => {
-    router.isReady().then(() => {
-        axios.get("/api/room/basic", {params: {room_id: route.params.roomid}}).then(rsp => {
+const AfterLogin = () => {
+    routerObj.isReady().then(() => {
+        API.get("/api/room/basic", {params: {room_id: route.params.roomid}}).then(rsp => {
             let data = rsp.data
             if (data.code != 0) {
                 message.error(`[${data.code}]请求失败: ${data.msg}`)
@@ -132,7 +141,7 @@ onMounted(() => {
             InitLiveList()
         }).catch(err => message.error(JSON.stringify(err)))
     })
-})
+}
 
 const LightUpPrepare = ref(false)
 const LightUpModalShow = ref(false)
@@ -169,7 +178,7 @@ const OpenModal = (liveData, header, comment, commit_cb) => {
 
 const PrpareLight = () => {
     LightUpPrepare.value = true
-    axios.get("/api/live/prepare", {params: {room_id: BasicInfo.room_id}}).then(rsp => {
+    API.get("/api/live/prepare", {params: {room_id: BasicInfo.room_id}}).then(rsp => {
         let data = rsp.data
         if (data.code != 0) {
             message.error(`[${data.code}]请求失败: ${data.msg}`)
@@ -189,7 +198,7 @@ const CommitHighLight = () => {
     let comment = LightUpComment.value
     if (!comment) comment = "(暂未填写描述)"
     HightLightCommitting.value = true
-    axios.post("/api/highlight/commit", {
+    API.post("/api/highlight/commit", {
         room_id: Number(BasicInfo.room_id),
         live_id: CurrentLiveInfo.live_id,
         ts: CurrentLiveInfo.light_ts,
