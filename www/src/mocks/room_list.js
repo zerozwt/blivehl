@@ -13,5 +13,5 @@ const RoomList = {
 };
 
 export default {
-    'get|^/apiroom/list$': opt => RoomList,
+    'get|^/api/room/list$': opt => RoomList,
 };
