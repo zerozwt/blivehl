@@ -16,7 +16,7 @@ func GetRoomInfoService() *RoomService {
 
 func (s *RoomService) GetBasicInfo(req *bs.BasicInfoRequest) (*bs.BasicInfoResponse, error) {
 	// get room info from fetcher
-	info, err := GetRoomInfoFetcher().GetRoomInfo(req.RoomID)
+	info, err := GetRoomInfoFetcher().Get(req.RoomID)
 	if err != nil {
 		return nil, err
 	}

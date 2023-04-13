@@ -176,7 +176,7 @@ const PrpareLight = () => {
             return
         }
         let liveData = data.data
-        if (!liveData.live_status) {
+        if (liveData.live_status != 1) {
             message.error(`主播未开播或已经下播，不能点灯。`)
             return
         }

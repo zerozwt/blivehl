@@ -51,7 +51,7 @@ func (s *HighlightService) GenerateCSVLines(roomId int, liveId int64) ([][]strin
 	fileNameParts := []string{}
 
 	// get streamer info
-	info, err := GetRoomInfoFetcher().GetRoomInfo(roomId)
+	info, err := GetRoomInfoFetcher().Get(roomId)
 	if err != nil {
 		logger.WARN("get streamer info for room %d failed: %v", roomId, err)
 		fileNameParts = append(fileNameParts, fmt.Sprint(roomId))

@@ -32,7 +32,7 @@ func GetLiveInfoService() *LiveInfoService {
 
 func (s *LiveInfoService) GetPrepareInfo(req *bs.PrepareRequest) (*bs.PrepareResponse, error) {
 	// get room info from fetcher
-	info, err := GetRoomInfoFetcher().GetRoomInfo(req.RoomID)
+	info, err := GetRoomInfoFetcher().Get(req.RoomID)
 	if err != nil {
 		return nil, err
 	}
@@ -54,7 +54,7 @@ func (s *LiveInfoService) GetPrepareInfo(req *bs.PrepareRequest) (*bs.PrepareRes
 	}
 
 	// save live info
-	if ret.LiveStatus != 0 {
+	if ret.LiveStatus == 1 {
 		err = db.SaveLiveInfo(req.RoomID, &ret.BasicLiveInfo)
 		if err != nil {
 			logger.ERROR("save live stream info to db for room %d failed: %v", req.RoomID, err)
@@ -72,7 +72,7 @@ func (s *LiveInfoService) GetLiveList(req *bs.LiveListRequest) (*bs.LiveListResp
 	// fetch current live info if until==0
 	var currentLive *bs.BasicLiveInfo
 	if req.Until == 0 {
-		info, err := GetRoomInfoFetcher().GetRoomInfo(req.RoomID)
+		info, err := GetRoomInfoFetcher().Get(req.RoomID)
 		if err == nil && info.Base.LiveStatus != 0 {
 			currentLive = &bs.BasicLiveInfo{
 				Title:         info.Base.Title,
