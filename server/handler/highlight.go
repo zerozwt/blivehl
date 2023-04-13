@@ -13,9 +13,9 @@ import (
 )
 
 func init() {
-	engine.RegisterApi("/commit", commitHighlight)
-	engine.RegisterApi("/timeline", queryTimeline)
-	engine.RegisterRawApi("/download", download)
+	engine.RegisterApi("/highlight/commit", commitHighlight)
+	engine.RegisterApi("/highlight/timeline", queryTimeline)
+	engine.RegisterRawApi("/highlight/download", download)
 }
 
 func commitHighlight(ctx *engine.Context, req *bs.CommitHighlightRequest) (*bs.CommitHighlightResponse, error) {

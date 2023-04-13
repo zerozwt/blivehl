@@ -7,8 +7,8 @@ import (
 )
 
 func init() {
-	engine.RegisterApi("/basic_info", basicInfo)
-	engine.RegisterApi("/room_list", recentRooms)
+	engine.RegisterApi("/room/basic", basicInfo)
+	engine.RegisterApi("/room/list", recentRooms)
 }
 
 func basicInfo(ctx *engine.Context, req *bs.BasicInfoRequest) (*bs.BasicInfoResponse, error) {

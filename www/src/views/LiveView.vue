@@ -77,7 +77,7 @@ const message = useMessage()
 const LiveList = reactive([])
 const LiveListEnded = ref(false)
 const InitLiveList = () => {
-    axios.get("/api/live_list", {params:{room_id: route.params.roomid, until: 0}}).then(rsp => {
+    axios.get("/api/live/list", {params:{room_id: route.params.roomid, until: 0}}).then(rsp => {
         let data = rsp.data
         if (data.code != 0) {
             message.error(`[${data.code}]请求失败: ${data.msg}`)
@@ -99,7 +99,7 @@ const Appending = ref(false)
 const AppendLiveList = () => {
     if (!LiveList.length) return
     Appending.value = true
-    axios.get("/api/live_list", {params:{room_id: route.params.roomid, until: LiveList[LiveList.length-1].live_id-1}}).then(rsp => {
+    axios.get("/api/live/list", {params:{room_id: route.params.roomid, until: LiveList[LiveList.length-1].live_id-1}}).then(rsp => {
         let data = rsp.data
         if (data.code != 0) {
             message.error(`[${data.code}]请求失败: ${data.msg}`)
@@ -117,7 +117,7 @@ const AppendLiveList = () => {
 
 onMounted(() => {
     router.isReady().then(() => {
-        axios.get("/api/basic_info", {params: {room_id: route.params.roomid}}).then(rsp => {
+        axios.get("/api/room/basic", {params: {room_id: route.params.roomid}}).then(rsp => {
             let data = rsp.data
             if (data.code != 0) {
                 message.error(`[${data.code}]请求失败: ${data.msg}`)
@@ -169,7 +169,7 @@ const OpenModal = (liveData, header, comment, commit_cb) => {
 
 const PrpareLight = () => {
     LightUpPrepare.value = true
-    axios.get("/api/prepare", {params: {room_id: BasicInfo.room_id}}).then(rsp => {
+    axios.get("/api/live/prepare", {params: {room_id: BasicInfo.room_id}}).then(rsp => {
         let data = rsp.data
         if (data.code != 0) {
             message.error(`[${data.code}]请求失败: ${data.msg}`)
@@ -189,7 +189,7 @@ const CommitHighLight = () => {
     let comment = LightUpComment.value
     if (!comment) comment = "(暂未填写描述)"
     HightLightCommitting.value = true
-    axios.post("/api/commit", {
+    axios.post("/api/highlight/commit", {
         room_id: Number(BasicInfo.room_id),
         live_id: CurrentLiveInfo.live_id,
         ts: CurrentLiveInfo.light_ts,

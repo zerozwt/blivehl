@@ -42,7 +42,7 @@ const RenderTimestamp = inject('RenderTimestamp')
 
 const refreshTimeline = () => {
     loadingTimeline.value = true
-    axios.get("/api/timeline", {params: {room_id: props.roomid, live_id: props.liveData.live_id}}).then(rsp => {
+    axios.get("/api/highlight/timeline", {params: {room_id: props.roomid, live_id: props.liveData.live_id}}).then(rsp => {
         let data = rsp.data
         if (data.code != 0) {
             message.error(`[${data.code}]请求失败: ${data.msg}`)
@@ -59,11 +59,11 @@ onMounted(refreshTimeline)
 onUpdated(refreshTimeline)
 
 const onDownload = () => {
-    window.open('/api/download?room_id='+props.roomid+'&live_id='+props.liveData.live_id, '_blank')
+    window.open('/api/highlight/download?room_id='+props.roomid+'&live_id='+props.liveData.live_id, '_blank')
 }
 
 const onEntryUpdate = (ts, comment) => {
-    axios.post("/api/commit", {
+    axios.post("/api/highlight/commit", {
         room_id: Number(props.roomid),
         live_id: Number(props.liveData.live_id),
         ts: Number(ts),

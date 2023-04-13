@@ -53,7 +53,7 @@ const jumpto = () => {
 const message = useMessage()
 
 onMounted(()=> {
-    axios.get("/api/room_list").then(rsp => {
+    axios.get("/api/room/list").then(rsp => {
         let data = rsp.data;
         if (data.code != 0) {
             message.error(`[${data.code}]请求失败: ${data.msg}`)
