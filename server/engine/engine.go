@@ -10,47 +10,50 @@ import (
 	"github.com/zerozwt/blivehl/server/logger"
 )
 
-var APIPrefix string = "/api"
+type Server struct {
+	apiPrefix string
+	apiMap    map[string]http.HandlerFunc
+	apiLock   sync.Mutex
 
-var apiMap map[string]http.HandlerFunc = make(map[string]http.HandlerFunc)
-var regLock sync.Mutex
-
-type myServer struct {
 	fileServer spaFileServer
 }
 
-func RegisterRawApi(api string, handler HandlerFunc, middlewares ...HandlerFunc) {
-	regLock.Lock()
-	defer regLock.Unlock()
-	apiMap[APIPrefix+api] = func(w http.ResponseWriter, r *http.Request) {
+var defaultServer *Server = NewServer("/api")
+
+func NewServer(apiPrfix string) *Server {
+	return &Server{
+		apiPrefix: apiPrfix,
+		apiMap:    map[string]http.HandlerFunc{},
+	}
+}
+
+func (s *Server) RegisterApi(api string, handler HandlerFunc, middlewares ...HandlerFunc) {
+	s.apiLock.Lock()
+	defer s.apiLock.Unlock()
+	s.apiMap[s.apiPrefix+api] = func(w http.ResponseWriter, r *http.Request) {
 		ctx := makeContext(w, r, append(middlewares, handler)...)
 		ctx.Next()
 	}
 }
 
-func RegisterApi[InType, OutType any](api string, handler func(*Context, *InType) (*OutType, error), middlewares ...HandlerFunc) {
-	regLock.Lock()
-	defer regLock.Unlock()
-	apiMap[APIPrefix+api] = makeAPIHandler(handler, middlewares...)
-}
-
-func Serve(wwwdir string, port int) {
-	svr := http.Server{
-		Addr:    fmt.Sprintf("localhost:%d", port),
-		Handler: &myServer{fileServer: spaFileServer(wwwdir)},
-	}
-	svr.ListenAndServe()
-}
-
-func (s *myServer) ServeHTTP(w http.ResponseWriter, r *http.Request) {
-	if strings.HasPrefix(r.URL.Path, APIPrefix) {
+func (s *Server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
+	if strings.HasPrefix(r.URL.Path, s.apiPrefix) {
 		s.serveApi(w, r)
 		return
 	}
 	s.fileServer.ServeHTTP(w, r)
 }
 
-func (s *myServer) serveApi(w http.ResponseWriter, r *http.Request) {
+func (s *Server) Serve(wwwdir string, port int) {
+	s.fileServer = spaFileServer(wwwdir)
+	svr := http.Server{
+		Addr:    fmt.Sprintf("localhost:%d", port),
+		Handler: s,
+	}
+	svr.ListenAndServe()
+}
+
+func (s *Server) serveApi(w http.ResponseWriter, r *http.Request) {
 	now := time.Now()
 	defer func() {
 		logger.INFO("process API call to %s cost time: %v", r.URL.Path, time.Since(now))
@@ -60,11 +63,23 @@ func (s *myServer) serveApi(w http.ResponseWriter, r *http.Request) {
 			w.Write([]byte(fmt.Sprint(err)))
 		}
 	}()
-	handler, ok := apiMap[r.URL.Path]
+	handler, ok := s.apiMap[r.URL.Path]
 	if !ok {
 		logger.ERROR("requst to API %s failed: API not found", r.URL.Path)
 		http.NotFound(w, r)
 		return
 	}
 	handler(w, r)
+}
+
+func RegisterRawApi(api string, handler HandlerFunc, middlewares ...HandlerFunc) {
+	defaultServer.RegisterApi(api, handler, middlewares...)
+}
+
+func RegisterApi[InType, OutType any](api string, handler func(*Context, *InType) (*OutType, error), middlewares ...HandlerFunc) {
+	defaultServer.RegisterApi(api, MakeAPIHandler(handler), middlewares...)
+}
+
+func Serve(wwwdir string, port int) {
+	defaultServer.Serve(wwwdir, port)
 }

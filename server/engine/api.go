@@ -16,8 +16,8 @@ func handleError(w http.ResponseWriter, r *http.Request, err error) {
 	w.Write([]byte(fmt.Sprint(err)))
 }
 
-func makeAPIHandler[InType, OutType any](handler func(*Context, *InType) (*OutType, error), middlewares ...HandlerFunc) http.HandlerFunc {
-	allHandlers := append(middlewares, func(ctx *Context) {
+func MakeAPIHandler[InType, OutType any](handler func(*Context, *InType) (*OutType, error)) HandlerFunc {
+	return func(ctx *Context) {
 		r := ctx.RawRequest
 		w := ctx.RawResponse
 		var param InType
@@ -65,10 +65,6 @@ func makeAPIHandler[InType, OutType any](handler func(*Context, *InType) (*OutTy
 
 		w.Header().Set("Content-Type", "application/json")
 		w.Write(outData)
-	})
-	return func(w http.ResponseWriter, r *http.Request) {
-		ctx := makeContext(w, r, allHandlers...)
-		ctx.Next()
 	}
 }
 
