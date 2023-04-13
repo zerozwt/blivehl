@@ -19,16 +19,19 @@ type myServer struct {
 	fileServer spaFileServer
 }
 
-func RegisterRawApi(api string, handler http.HandlerFunc) {
+func RegisterRawApi(api string, handler HandlerFunc, middlewares ...HandlerFunc) {
 	regLock.Lock()
 	defer regLock.Unlock()
-	apiMap[APIPrefix+api] = handler
+	apiMap[APIPrefix+api] = func(w http.ResponseWriter, r *http.Request) {
+		ctx := makeContext(w, r, append(middlewares, handler)...)
+		ctx.Next()
+	}
 }
 
-func RegisterApi[InType, OutType any](api string, handler func(*InType) (*OutType, error)) {
+func RegisterApi[InType, OutType any](api string, handler func(*Context, *InType) (*OutType, error), middlewares ...HandlerFunc) {
 	regLock.Lock()
 	defer regLock.Unlock()
-	apiMap[APIPrefix+api] = makeAPIHandler(handler)
+	apiMap[APIPrefix+api] = makeAPIHandler(handler, middlewares...)
 }
 
 func Serve(wwwdir string, port int) {

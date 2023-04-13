@@ -16,8 +16,10 @@ func handleError(w http.ResponseWriter, r *http.Request, err error) {
 	w.Write([]byte(fmt.Sprint(err)))
 }
 
-func makeAPIHandler[InType, OutType any](handler func(*InType) (*OutType, error)) http.HandlerFunc {
-	return func(w http.ResponseWriter, r *http.Request) {
+func makeAPIHandler[InType, OutType any](handler func(*Context, *InType) (*OutType, error), middlewares ...HandlerFunc) http.HandlerFunc {
+	allHandlers := append(middlewares, func(ctx *Context) {
+		r := ctx.RawRequest
+		w := ctx.RawResponse
 		var param InType
 		json := jsoniter.ConfigCompatibleWithStandardLibrary
 		if r.Method == http.MethodGet {
@@ -43,7 +45,7 @@ func makeAPIHandler[InType, OutType any](handler func(*InType) (*OutType, error)
 
 		outCode := 0
 		outMsg := ""
-		out, err := handler(&param)
+		out, err := handler(ctx, &param)
 		if err != nil {
 			outCode = 233
 			outMsg = err.Error()
@@ -63,6 +65,10 @@ func makeAPIHandler[InType, OutType any](handler func(*InType) (*OutType, error)
 
 		w.Header().Set("Content-Type", "application/json")
 		w.Write(outData)
+	})
+	return func(w http.ResponseWriter, r *http.Request) {
+		ctx := makeContext(w, r, allHandlers...)
+		ctx.Next()
 	}
 }
 

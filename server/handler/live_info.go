@@ -11,10 +11,10 @@ func init() {
 	engine.RegisterApi("/live_list", getLiveList)
 }
 
-func getPrepareInfo(req *bs.PrepareRequest) (*bs.PrepareResponse, error) {
+func getPrepareInfo(ctx *engine.Context, req *bs.PrepareRequest) (*bs.PrepareResponse, error) {
 	return service.GetLiveInfoService().GetPrepareInfo(req)
 }
 
-func getLiveList(req *bs.LiveListRequest) (*bs.LiveListResponse, error) {
+func getLiveList(ctx *engine.Context, req *bs.LiveListRequest) (*bs.LiveListResponse, error) {
 	return service.GetLiveInfoService().GetLiveList(req)
 }

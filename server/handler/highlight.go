@@ -18,15 +18,17 @@ func init() {
 	engine.RegisterRawApi("/download", download)
 }
 
-func commitHighlight(req *bs.CommitHighlightRequest) (*bs.CommitHighlightResponse, error) {
+func commitHighlight(ctx *engine.Context, req *bs.CommitHighlightRequest) (*bs.CommitHighlightResponse, error) {
 	return service.GetHightlightService().Commit(req)
 }
 
-func queryTimeline(req *bs.TimelineRequest) (*bs.TimelineResponse, error) {
+func queryTimeline(ctx *engine.Context, req *bs.TimelineRequest) (*bs.TimelineResponse, error) {
 	return service.GetHightlightService().Query(req)
 }
 
-func download(w http.ResponseWriter, r *http.Request) {
+func download(ctx *engine.Context) {
+	r := ctx.RawRequest
+	w := ctx.RawResponse
 	req := bs.DownloadRequest{}
 	if err := engine.DecodeForm(r, &req); err != nil {
 		logger.ERROR("decode download request failed: %v", err)

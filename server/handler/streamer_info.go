@@ -11,11 +11,11 @@ func init() {
 	engine.RegisterApi("/room_list", recentRooms)
 }
 
-func basicInfo(req *bs.BasicInfoRequest) (*bs.BasicInfoResponse, error) {
+func basicInfo(ctx *engine.Context, req *bs.BasicInfoRequest) (*bs.BasicInfoResponse, error) {
 	return service.GetRoomInfoService().GetBasicInfo(req)
 }
 
-func recentRooms(req *bs.RoomListRequest) (*bs.RoomListResponse, error) {
+func recentRooms(ctx *engine.Context, req *bs.RoomListRequest) (*bs.RoomListResponse, error) {
 	return service.GetRoomInfoService().GetRecentRooms()
 }
 
