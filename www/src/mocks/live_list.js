@@ -27,5 +27,5 @@ const LiveList = {
 }
 
 export default {
-    'get|^/api/live_list': opt => LiveList
+    'get|^/api/live/list': opt => LiveList
 }

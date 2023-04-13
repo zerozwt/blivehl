@@ -12,5 +12,5 @@ const Prepare = {
 }
 
 export default {
-    'get|^/api/prepare': opt => Prepare
+    'get|^/api/live/prepare': opt => Prepare
 }

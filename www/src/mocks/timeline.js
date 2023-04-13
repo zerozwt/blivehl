@@ -13,5 +13,5 @@ const Timeline = {
 }
 
 export default {
-    'get|^/api/timeline': opt => Timeline
+    'get|^/api/highlight/timeline': opt => Timeline
 }

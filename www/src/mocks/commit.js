@@ -5,5 +5,5 @@ const Commit = {
 }
 
 export default {
-    'post|^/api/commit$': opt => Commit
+    'post|^/api/highlight/commit$': opt => Commit
 }

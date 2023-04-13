@@ -11,5 +11,5 @@ const BasicInfo = {
 }
 
 export default {
-    'get|^/api/basic_info\\?room_id=[0-9]+$': opt => BasicInfo,
+    'get|^/api/room/basic\\?room_id=[0-9]+$': opt => BasicInfo,
 };
