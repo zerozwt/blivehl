@@ -149,7 +149,7 @@ const CurrentLiveInfo = reactive({
 const RenderTimestamp = (value) => {
     let timeNumber = value => value < 10 ? '0'+value : value
     let ret = `${timeNumber(Math.floor((value%3600)/60))}分${timeNumber(value%60)}秒`
-    return value > 3600 ? `${Math.floor(value/3600)}小时`+ret : ret
+    return value >= 3600 ? `${Math.floor(value/3600)}小时`+ret : ret
 }
 provide('RenderTimestamp', RenderTimestamp)
 
