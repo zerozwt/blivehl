@@ -68,3 +68,23 @@ func BatchGetUser(users []string) (map[string]User, error) {
 
 	return ret, err
 }
+
+func GetAllUsers() ([]User, error) {
+	ret := []User{}
+	err := gDB.View(func(tx *bbolt.Tx) error {
+		bucket := tx.Bucket(userBucket)
+		if bucket == nil {
+			return nil
+		}
+
+		return bucket.ForEach(func(k, v []byte) error {
+			item := User{}
+			if err := decodeValue(v, &item); err != nil {
+				return err
+			}
+			ret = append(ret, item)
+			return nil
+		})
+	})
+	return ret, err
+}

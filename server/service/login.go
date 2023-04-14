@@ -112,3 +112,8 @@ func (s *LoginService) ChangePassword(user, oldPass, newPass string) error {
 
 	return db.PutUser(userInfo)
 }
+
+func (s *LoginService) PutUser(user db.User) error {
+	user.Password = s.encryptByPassword(user.Password, user.Password)
+	return db.PutUser(user)
+}
