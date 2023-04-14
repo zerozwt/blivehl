@@ -2,6 +2,7 @@ package utils
 
 import (
 	"net/http"
+	"strings"
 
 	"github.com/zerozwt/blivehl/server/engine"
 )
@@ -25,11 +26,18 @@ func PutCtxCookie(ctx *engine.Context, cookie string) {
 		Name:     COOKIE_KEY,
 		Value:    cookie,
 		Path:     "/",
-		Domain:   ctx.RawRequest.Host,
+		Domain:   trimPort(ctx.RawRequest.Host),
 		HttpOnly: true,
 		SameSite: http.SameSiteLaxMode,
 	}
 	ctx.RawResponse.Header().Set("Set-Cookie", cookieObj.String())
+}
+
+func trimPort(host string) string {
+	if idx := strings.LastIndex(host, ":"); idx >= 0 {
+		return host[:idx]
+	}
+	return host
 }
 
 func GetCtxUser(ctx *engine.Context) (string, bool) {

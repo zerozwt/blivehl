@@ -32,7 +32,9 @@ func (s *LoginService) CheckCookie(cookie string) (string, bool, error) {
 		return "", false, err
 	}
 
-	return s.GetUserInfo(userID)
+	_, isAdmin, err := s.GetUserInfo(userID)
+
+	return userID, isAdmin, err
 }
 
 func (s *LoginService) LoginAndGenerateCookie(user, pass string) (string, error) {

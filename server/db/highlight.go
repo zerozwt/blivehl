@@ -81,13 +81,14 @@ func QueryAllTimeline(roomId int, liveId int64) ([]bs.AdminTimelineEntry, error)
 			if bucket == nil {
 				return nil
 			}
+			author := string(k)
 			bucket.ForEach(func(k, v []byte) error {
 				item := bs.TimelineEntry{}
 				err := decodeValue(v, &item)
 				if err != nil {
 					return err
 				}
-				adminItem := bs.AdminTimelineEntry{Author: string(k)}
+				adminItem := bs.AdminTimelineEntry{Author: author}
 				adminItem.Time = item.Time
 				adminItem.Comment = item.Comment
 				ret = append(ret, adminItem)
