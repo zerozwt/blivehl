@@ -13,17 +13,17 @@ import (
 )
 
 func init() {
-	engine.RegisterApi("/highlight/commit", commitHighlight)
-	engine.RegisterApi("/highlight/timeline", queryTimeline)
-	engine.RegisterRawApi("/highlight/download", download)
+	engine.RegisterApi("/highlight/commit", commitHighlight, loginChecker)
+	engine.RegisterApi("/highlight/timeline", queryTimeline, loginChecker)
+	engine.RegisterRawApi("/highlight/download", download, loginChecker)
 }
 
 func commitHighlight(ctx *engine.Context, req *bs.CommitHighlightRequest) (*bs.CommitHighlightResponse, error) {
-	return service.GetHightlightService().Commit(req)
+	return service.GetHightlightService().Commit(ctx, req)
 }
 
 func queryTimeline(ctx *engine.Context, req *bs.TimelineRequest) (*bs.TimelineResponse, error) {
-	return service.GetHightlightService().Query(req)
+	return service.GetHightlightService().Query(ctx, req)
 }
 
 func download(ctx *engine.Context) {
@@ -36,7 +36,7 @@ func download(ctx *engine.Context) {
 		return
 	}
 
-	csvLines, fileName, err := service.GetHightlightService().GenerateCSVLines(req.RoomID, req.LiveID)
+	csvLines, fileName, err := service.GetHightlightService().GenerateCSVLines(ctx, req.RoomID, req.LiveID)
 
 	if err != nil {
 		logger.ERROR("download generate csv lines failed: %v", err)

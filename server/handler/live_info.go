@@ -7,8 +7,8 @@ import (
 )
 
 func init() {
-	engine.RegisterApi("/live/prepare", getPrepareInfo)
-	engine.RegisterApi("/live/list", getLiveList)
+	engine.RegisterApi("/live/prepare", getPrepareInfo, loginChecker)
+	engine.RegisterApi("/live/list", getLiveList, loginChecker)
 }
 
 func getPrepareInfo(ctx *engine.Context, req *bs.PrepareRequest) (*bs.PrepareResponse, error) {

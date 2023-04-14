@@ -13,3 +13,12 @@ type TimelineEntry struct {
 type TimelineResponse struct {
 	Timeline []TimelineEntry `json:"timeline"`
 }
+
+type AdminTimelineEntry struct {
+	TimelineEntry
+	Author string `json:"author"`
+}
+
+type AdminTimelineResponse struct {
+	Timeline []AdminTimelineEntry `json:"timeline"`
+}

@@ -51,3 +51,27 @@ func QueryLiveInfo(roomId int, until int64, limit int) ([]*bs.BasicLiveInfo, err
 
 	return ret, err
 }
+
+func QueryLiveInfoByRange(roomId int, start, end int64) ([]bs.BasicLiveInfo, int, error) {
+	ret := []bs.BasicLiveInfo{}
+	idx := 0
+	err := gDB.View(func(tx *bbolt.Tx) error {
+		bucket := tx.Bucket(liveListBucketKey(roomId))
+		if bucket == nil {
+			return nil
+		}
+		cursor := bucket.Cursor()
+		for k, v := cursor.First(); k != nil; k, v = cursor.Next() {
+			if int64(idx) >= start && int64(idx) < end {
+				item := bs.BasicLiveInfo{}
+				if err := decodeValue(v, &item); err != nil {
+					return err
+				}
+				ret = append(ret, item)
+			}
+			idx++
+		}
+		return nil
+	})
+	return ret, idx, err
+}

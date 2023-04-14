@@ -1,6 +1,7 @@
 package service
 
 import (
+	"errors"
 	"fmt"
 	"time"
 
@@ -116,4 +117,13 @@ func (s *LiveInfoService) GetLiveList(req *bs.LiveListRequest) (*bs.LiveListResp
 	}
 
 	return &ret, nil
+}
+
+func (s *LiveInfoService) GetLiveListByPage(roomID, page, pageSize int) ([]bs.BasicLiveInfo, int, error) {
+	if page < 1 || pageSize < 1 {
+		return nil, 0, errors.New("invalid page")
+	}
+	start := int64(page-1) * int64(pageSize)
+	end := start + int64(pageSize)
+	return db.QueryLiveInfoByRange(roomID, start, end)
 }

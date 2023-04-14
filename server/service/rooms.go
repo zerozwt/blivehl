@@ -3,6 +3,7 @@ package service
 import (
 	"github.com/zerozwt/blivehl/server/bs"
 	"github.com/zerozwt/blivehl/server/db"
+	"github.com/zerozwt/blivehl/server/engine"
 	"github.com/zerozwt/blivehl/server/logger"
 )
 
@@ -14,7 +15,7 @@ func GetRoomInfoService() *RoomService {
 	return gRoomService
 }
 
-func (s *RoomService) GetBasicInfo(req *bs.BasicInfoRequest) (*bs.BasicInfoResponse, error) {
+func (s *RoomService) GetBasicInfo(ctx *engine.Context, req *bs.BasicInfoRequest) (*bs.BasicInfoResponse, error) {
 	// get room info from fetcher
 	info, err := GetRoomInfoFetcher().Get(req.RoomID)
 	if err != nil {
@@ -40,21 +41,23 @@ func (s *RoomService) GetBasicInfo(req *bs.BasicInfoRequest) (*bs.BasicInfoRespo
 	}
 
 	// store room info into db (allow fail)
-	err = db.SaveRecentLiveRoom(ret.Streamer.UID, req.RoomID, ret.Streamer.Name, ret.Streamer.Icon)
-	if err != nil {
-		logger.WARN("save streamer %d info to db failed: %v", ret.Streamer.UID, err)
+	if req.NeedSaveRecent() {
+		err = db.SaveRecentLiveRoom(ctx, ret.Streamer.UID, req.RoomID, ret.Streamer.Name, ret.Streamer.Icon)
+		if err != nil {
+			logger.WARN("save streamer %d info to db failed: %v", ret.Streamer.UID, err)
+		}
 	}
 
 	<-ch_cover
 	return ret, nil
 }
 
-func (s *RoomService) GetRecentRooms() (*bs.RoomListResponse, error) {
+func (s *RoomService) getRooms(getter func() ([]*db.LiveRoomInfo, error)) (*bs.RoomListResponse, error) {
 	ret := &bs.RoomListResponse{
 		List: []bs.RecentLiveRoom{},
 	}
 
-	list, err := db.GetRecentRooms()
+	list, err := getter()
 	if err != nil {
 		return nil, err
 	}
@@ -68,4 +71,12 @@ func (s *RoomService) GetRecentRooms() (*bs.RoomListResponse, error) {
 	}
 
 	return ret, nil
+}
+
+func (s *RoomService) GetRecentRooms(ctx *engine.Context) (*bs.RoomListResponse, error) {
+	return s.getRooms(func() ([]*db.LiveRoomInfo, error) { return db.GetRecentRooms(ctx) })
+}
+
+func (s *RoomService) GetAllLiveRooms() (*bs.RoomListResponse, error) {
+	return s.getRooms(db.GetAllRooms)
 }
