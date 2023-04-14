@@ -37,7 +37,7 @@ func (ctx *Context) Next() {
 }
 
 func (ctx *Context) PutValue(key, value any) {
-	ctx.values[key] = ctx.values[value]
+	ctx.values[key] = value
 }
 
 func (ctx *Context) GetValue(key any) (any, bool) {
