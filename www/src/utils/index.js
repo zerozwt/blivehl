@@ -6,6 +6,10 @@ const jumpToLoginOrResolve = (router, rsp, resolve) => {
         router.push("/login")
         return
     }
+    if (data.code == 1919810) {
+        router.push("/")
+        return
+    }
     resolve(rsp)
 }
 

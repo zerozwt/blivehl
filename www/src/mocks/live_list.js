@@ -26,6 +26,24 @@ const LiveList = {
     }
 }
 
+const AdminLiveList = (opt) => {
+    let ret = {
+        code: 0,
+        msg: "",
+        data: {list: [], total: 100},
+    }
+    for (let i = 0; i < 10; i++) {
+        ret.data.list.push({
+            title: `直播${i+1}`,
+            live_start_time: "2023-03-30 20:00:00 CST",
+            cover: "/icon.png",
+            live_id: 100-i
+        })
+    }
+    return ret
+}
+
 export default {
-    'get|^/api/live/list': opt => LiveList
+    'get|^/api/live/list': opt => LiveList,
+    'get|^/api/admin/lives': AdminLiveList
 }

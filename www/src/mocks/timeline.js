@@ -12,6 +12,25 @@ const Timeline = {
     }
 }
 
+const AdminTimeline = (opt) => {
+    let ret = {
+        code: 0,
+        msg: "",
+        data: {
+            timeline: [],
+        },
+    }
+    for (let i = 0; i < 20; i++) {
+        ret.data.timeline.push({
+            time: 3000+60*i,
+            comment: "哈哈哈",
+            author: `点灯员${(i%4)+1}`
+        })
+    }
+    return ret
+}
+
 export default {
-    'get|^/api/highlight/timeline': opt => Timeline
+    'get|^/api/highlight/timeline': opt => Timeline,
+    'get|^/api/admin/timeline': AdminTimeline,
 }

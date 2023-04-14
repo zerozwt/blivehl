@@ -16,7 +16,7 @@
                         <n-input type="password" v-model:value="UserPass" placeholder="你的密码是？" />
                     </n-space>
                     <template #action>
-                        <div class="login-action-bar">
+                        <div class="clear-float">
                             <n-button style="float: right" type="primary" :loading="Loading" :disabled="Disabled" @click="Login">
                                 登录
                             </n-button>
@@ -65,10 +65,5 @@ const Login = () => {
 .login-card {
     margin: 240px auto 0 auto;
     max-width: 480px;
-}
-.login-action-bar:after {
-    content: "";
-    display: block;
-    clear: both;
 }
 </style>

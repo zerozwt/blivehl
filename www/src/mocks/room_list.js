@@ -14,4 +14,5 @@ const RoomList = {
 
 export default {
     'get|^/api/room/list$': opt => RoomList,
+    'get|^/api/admin/rooms$': opt => RoomList,
 };

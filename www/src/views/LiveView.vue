@@ -1,7 +1,7 @@
 <template>
     <n-layout>
         <n-layout-header bordered>
-            <div class="navbar">
+            <div class="clear-float">
                 <div style="float:left; padding-top: 1px;">
                     <n-breadcrumb separator=">">
                         <n-breadcrumb-item><router-link to="/">首页</router-link></n-breadcrumb-item>
@@ -126,7 +126,7 @@ const AppendLiveList = () => {
 
 const AfterLogin = () => {
     routerObj.isReady().then(() => {
-        API.get("/api/room/basic", {params: {room_id: route.params.roomid}}).then(rsp => {
+        API.get("/api/room/basic", {params: {room_id: route.params.roomid, save_recent: true}}).then(rsp => {
             let data = rsp.data
             if (data.code != 0) {
                 message.error(`[${data.code}]请求失败: ${data.msg}`)

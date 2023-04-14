@@ -9,6 +9,7 @@ const UserInfo = {
     msg: "",
     data: {
         name: "这是用户名",
+        admin: true,
     },
 }
 

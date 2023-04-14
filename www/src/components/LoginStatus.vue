@@ -1,6 +1,12 @@
 <template>
     <n-space>
-        <div style="padding-top: 2px;">{{ UserName ? UserName : "-" }}</div>
+        <div class="nametag"><n-icon size="18"><UserIcon/></n-icon><p>{{ UserName ? UserName : "-" }}</p></div>
+        <div v-if="IsAdmin">
+            <n-button quaternary size="small" @click="Manage">
+                <template #icon><n-icon><DataIcon/></n-icon></template>
+                数据管理
+            </n-button>
+        </div>
         <div>
             <n-button quaternary size="small" @click="ChangePassword">
                 <template #icon><n-icon><PasswordIcon/></n-icon></template>
@@ -25,7 +31,7 @@
                 <n-input type="password" v-model:value="NewPass2" placeholder="防止打错所以需要再输入一遍"/>
             </n-space>
             <template #action>
-                <div class="change-pass-action">
+                <div class="clear-float">
                     <n-button type="primary" :disabled="ChangeButtonDisabled" :loading="ChangeButtonLoading" style="float: right" @click="Change">修改密码</n-button>
                 </div>
             </template>
@@ -36,6 +42,8 @@
 <script setup>
 import ShutdownIcon from './icons/ShutdownIcon.vue'
 import PasswordIcon from './icons/PasswordIcon.vue'
+import DataIcon from './icons/DataIcon.vue'
+import UserIcon from './icons/UserIcon.vue'
 import { computed, onMounted, ref } from 'vue';
 import router from "@/router"
 import createAPICaller from '@/utils'
@@ -46,6 +54,8 @@ const message = useMessage()
 const emit = defineEmits(['login'])
 
 const UserName = ref("")
+const IsAdmin = ref(false)
+
 const ShowChangePass = ref(false)
 const OldPass = ref("")
 const NewPass = ref("")
@@ -88,6 +98,10 @@ const Change = () => {
     })
 }
 
+const Manage = () => {
+    router.push("/admin/overview")
+}
+
 onMounted(() => {
     API.get("/api/user/info").then(rsp => {
         let data = rsp.data;
@@ -96,6 +110,7 @@ onMounted(() => {
             return
         }
         UserName.value = data.data.name
+        IsAdmin.value = data.data.admin
         emit("login")
     }).catch(err => message.error(JSON.stringify(err)))
 })
@@ -105,9 +120,18 @@ onMounted(() => {
 .changepw-modal {
     max-width: 400px;
 }
-.change-pass-action:after {
-    content: "";
-    display: block;
-    clear: both;
+
+.nametag {
+    display: flex;
+    padding-top: 3px;
+}
+
+.nametag p {
+    font-size: 14px;
+    margin-left: 2px;
+}
+
+.nametag n-icon {
+    padding-top: 2px;
 }
 </style>

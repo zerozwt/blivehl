@@ -1,7 +1,7 @@
 <template>
     <n-layout>
         <n-layout-header bordered>
-            <div class="navbar">
+            <div class="clear-float">
                 <div style="float:left; padding-top: 1px;">
                     <n-breadcrumb separator=">">
                         <n-breadcrumb-item>首页</n-breadcrumb-item>
@@ -83,11 +83,5 @@ const AfterLogin = ()=> {
 .room-bar {
     padding: 8px 0;
     margin-bottom: 8px;
-}
-
-.navbar:after {
-    content: "";
-    display: block;
-    clear: both;
 }
 </style>
